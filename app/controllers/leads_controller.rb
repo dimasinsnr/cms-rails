@@ -104,15 +104,11 @@ class LeadsController < ApplicationController
       action = approve_data[:action]
   
       if action == 'approved'
-        # Mengubah status lead menjadi 'approved'
         @lead.status = 'approved'
         
-        # Menyimpan perubahan status lead
         if @lead.save
-          # Membuat customer baru secara manual setelah status approved
           product_id_value = @lead.product.present? ? @lead.product.id : nil
   
-          # Membuat entri customer baru
           Customer.create(
             name: @lead.name, 
             email: @lead.email, 
@@ -127,7 +123,6 @@ class LeadsController < ApplicationController
       elsif action == 'rejected'
         @lead.status = 'rejected'
         
-        # Menyimpan perubahan status lead
         if @lead.save
           render json: { success: true, message: 'Lead has been rejected' }
         else
