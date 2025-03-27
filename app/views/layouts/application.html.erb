@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Smart Crm" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+.pagination-container {
+  display: flex;
+  justify-content: flex-end; /* Menempatkan pagination di kanan */
+  margin-top: 10px;
+}
+
+/* Style untuk pagination */
+.pagination {
+  list-style: none;
+  display: flex;
+  gap: 6px; /* Jarak antar link lebih kecil */
+  padding: 0;
+  margin: 0;
+}
+
+/* Style untuk setiap item pagination */
+.pagination li {
+  display: inline-block;
+}
+
+/* Style untuk link pagination */
+.pagination a,
+.pagination span {
+  display: inline-block;
+  padding: 6px 10px; /* Ukuran lebih kecil */
+  border-radius: 4px;
+  text-decoration: none;
+  color: #444; /* Warna teks gelap tapi lebih soft */
+  font-size: 12px; /* Ukuran font lebih kecil */
+  font-weight: 400; /* Font weight yang lebih ringan */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border: 1px solid #ccc; /* Border tipis dan soft */
+}
+
+/* Style untuk halaman aktif */
+.pagination .active a {
+  background-color: #f0f0f0;
+  color: #777;
+  cursor: default;
+  border: 1px solid #ccc; /* Border lebih soft */
+}
+
+/* Style untuk link saat hover */
+.pagination a:hover {
+  background-color: #e0e0e0;
+  color: #333;
+  border-color: #bbb;
+}
+
+/* Style untuk tombol next dan prev */
+.pagination .prev, .pagination .next {
+  font-weight: 500;
+  background-color: #f8f8f8;
+  color: #444;
+  border: 1px solid #ccc;
+}
+
+.pagination .prev:hover, .pagination .next:hover {
+  background-color: #e0e0e0;
+  color: #333;
+  border-color: #bbb;
+}
+    </style>
+  </head>
+
+  <body>
+    <%= yield %>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      var HELPER = (function () {
+        var block = function (message = 'Loading...') {
+          $.blockUI({
+            message: `<div class="blockui-message" style="z-index: 9999"><span class="spinner-border text-primary"></span> ${message} </div>`,
+            css: {
+              border: 'none',
+              backgroundColor: 'rgba(47, 53, 59, 0)',
+              'z-index': 9999
+            }
+          });
+        };
+
+        var unblock = function (delay = 0) {
+          window.setTimeout(function () {
+            $.unblockUI();
+          }, delay);
+        };
+
+        return {
+          block: block,
+          unblock: unblock,
+          showMessage: function(config) {
+              config = $.extend(true, {
+                  success: false,
+                  message: 'System error, please contact the Administrator',
+                  title: 'Failed',
+                  time: 5000,
+                  sticky: false,
+                  allowOutsideClick: true,
+                  toast: false,
+                  // image: ((config.success) ? './assets/img/success.png' : './assets/img/error.png'),
+                  callback: function() {},
+              }, config);
+              if (config.toast === false) {
+                  if (config.success == true) {
+                      Swal.fire({
+                          title: (config.title == "Failed") ? "Success" : config.title,
+                          text: config.message,
+                          icon: "success",
+                          allowOutsideClick: config.allowOutsideClick,
+                      }).then(function(result) {
+                          config.callback(result);
+                      });
+                  } else {
+                      if (config.success == false) {
+                          Swal.fire({
+                              title: config.title,
+                              text: config.message,
+                              icon: "error",
+                              allowOutsideClick: config.allowOutsideClick,
+                          }).then(function(result) {
+                              config.callback(result);
+                          });
+                      } else {
+                          Swal.fire({
+                              title: config.title,
+                              text: config.message,
+                              icon: config.success,
+                              allowOutsideClick: config.allowOutsideClick,
+                          }).then(function(result) {
+                              config.callback(result);
+                          });
+                      }
+                  }
+              } else {
+                  toastr.options = {"closeButton": true,"debug": false,"newestOnTop": false,"progressBar": true,"positionClass": "toast-bottom-right","preventDuplicates": false,"onclick": null,"showDuration": "300","hideDuration": "1000","timeOut": "5000","extendedTimeOut": "1000","showEasing": "swing","hideEasing": "linear","showMethod": "fadeIn","hideMethod": "fadeOut"};
+                  if (config.success == true) {
+                      toastr.success(config.message, (config.title == "Failed") ? "Success" : config.title);
+                  }else if (config.success == false) {
+                      toastr.error(config.message, config.title);
+                  }else if (config.success == "warning") {
+                      toastr.warning(config.message, (config.title == "Failed") ? "Warning" : config.title);
+                  }else{
+                      toastr.info(config.message, config.title);
+                  }
+              }
+          },
+          confirm: function(config) {
+            config = $.extend(true, {
+                title: 'Information',
+                message: null,
+                size: 'small',
+                type: 'warning',
+                confirmLabel: '<i class="fa fa-check"></i> Yes',
+                confirmClassName: 'btn btn-focus btn-success m-btn m-btn--pill m-btn--air',
+                cancelLabel: '<i class="fa fa-times"></i> No',
+                cancelClassName: 'btn btn-focus btn-danger m-btn m-btn--pill m-btn--air',
+                showLoaderOnConfirm: false,
+                allowOutsideClick: true,
+                callback: function() {}
+            }, config);
+            Swal.fire({
+                title: config.title,
+                text: config.message,
+                icon: config.type,
+                confirmButtonText: config.confirmLabel,
+                confirmButtonClass: config.confirmClassName,
+                reverseButtons: true,
+                showCancelButton: true,
+                cancelButtonText: config.cancelLabel,
+                cancelButtonClass: config.cancelClassName,
+                allowOutsideClick: config.allowOutsideClick
+            }).then(function(result) {
+                config.callback(result.value);
+            });
+          },
+        };
+      })();
+    </script>
+  </body>
+</html>

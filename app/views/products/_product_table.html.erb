@@ -1,0 +1,48 @@
+<div class="card" style="border-radius: 7px">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Produk</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Produk</th>
+                    <th>Harga</th>
+                    <% if can?(:create, Product) %>
+                        <th>Aksi</th>
+                    <% end %>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                <% if products.empty? %>
+                    <tr>
+                        <td colspan="<%= can?(:create, Product) ? 7 : 6 %>" class="text-center">Tidak ada data</td>
+                    </tr>
+                <% else %>
+                    <% products.each_with_index do |product, index| %>
+                        <tr id='product-row-<%= @start_index + 1  %>'>
+                            <td><%= @start_index + index %></td>
+                            <td><%= product.name %></td>
+                            <td><%= number_to_currency(product.price, unit: "Rp") %></td>
+                            <% if can?(:create, Product) %>
+                                <td>
+                                    <a href="javascript:void(0)" style="text-decoration: none;" class="text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit Produk" onclick="onEdit('<%= product.id %>', '<%= product.name %>', '<%= product.price %>')">
+                                        <i class="bi bi-pencil-square fs-5"></i>
+                                    </a>
+                                    <a href="javascript:void(0)" style="text-decoration: none;" class="text-body ms-3" data-bs-toggle="tooltip" data-bs-original-title="Delete Produk" onclick="onDelete('<%= product.id %>', '<%= index + 1 %>')">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </a>
+                                </td>
+                            <% end %>
+                        </tr>
+                    <% end %>
+                <% end %>
+            </tbody>
+        </table>
+
+        <div class="pagination-container">
+            <%= paginate @products, remote: false, links: true, next_label: "Next ›", previous_label: "‹ Prev", window: 10 %>
+        </div>
+    </div>
+</div>

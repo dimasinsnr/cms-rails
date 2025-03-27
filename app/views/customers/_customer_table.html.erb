@@ -1,0 +1,43 @@
+<div class="card" style="border-radius: 7px">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Customer</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>No. Telp</th>
+                    <th>Status</th>
+                    <th>Produk</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody">
+                <% if customers.empty? %>
+                    <tr>
+                        <td colspan="6" class="text-center">Tidak ada data</td>
+                    </tr>
+                <% else %>
+                    <% customers.each_with_index do |customer, index| %>
+                        <tr id='customer-row-<%= @start_index + 1  %>'>
+                            <td><%= @start_index + index %></td>
+                            <td><%= customer.name %></td>
+                            <td><%= customer.email %></td>
+                            <td><%= customer.phone %></td>
+                            <td>
+                            <span class="badge bg-success">approve</span>
+                            </td>
+                            <td><%= customer.product ? customer.product.name : 'Product not found' %></td>
+                        </tr>
+                    <% end %>
+                <% end %>
+            </tbody>
+        </table>
+
+        <div class="pagination-container">
+            <%= paginate @customers, remote: false, links: true, next_label: "Next ›", previous_label: "‹ Prev", window: 10 %>
+        </div>
+    </div>
+</div>

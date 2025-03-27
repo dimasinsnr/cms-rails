@@ -1,0 +1,80 @@
+<div class="card" style="border-radius: 7px">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Lead</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>No. Telp</th>
+                    <th>Status</th>
+                    <th>Produk</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="leadTableBody">
+                <% if leads.empty? %>
+                    <tr>
+                        <td colspan="<%= can?(:create, Lead) ? 7 : 6 %>" class="text-center">Tidak ada data</td>
+                    </tr>
+                <% else %>
+                    <% leads.each_with_index do |lead, index| %>
+                        <tr id='lead-row-<%= @start_index + 1  %>'>
+                            <td><%= @start_index + index %></td>
+                            <td><%= lead.name %></td>
+                            <td><%= lead.email %></td>
+                            <td><%= lead.phone %></td>
+                            <td>
+                                <% if lead.status == 'draf' %>
+                                    <span class="badge bg-secondary">Draf</span>
+                                <% elsif lead.status == 'waiting' %>
+                                    <span class="badge bg-warning text-dark">Waiting to Approve</span>
+                                <% elsif lead.status == 'rejected' %>
+                                    <span class="badge bg-danger">Rejected</span>
+                                <% elsif lead.status == 'approved' %>
+                                    <span class="badge bg-success">Approved</span>
+                                <% else %>
+                                    <span class="badge bg-light">Status Tidak Dikenal</span>
+                                <% end %>
+                            </td>
+                            <td><%= lead.product ? lead.product.name : 'Product not found' %></td>
+                                <td>
+                                    <% if lead.status != 'draf' %>
+                                        <a href="javascript:void(0)" style="text-decoration: none;" class="text-body" data-bs-toggle="tooltip" data-bs-original-title="View Lead" onclick="onView('<%= lead.name %>', '<%= lead.email %>', '<%= lead.phone %>', '<%= lead.product_id %>')">
+                                            <i class="bi bi-pencil-square fs-5"></i>
+                                        </a>
+                                    <% else %>
+                                        <a href="javascript:void(0)" style="text-decoration: none;" class="text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit Lead" onclick="onEdit('<%= lead.id %>', '<%= lead.name %>', '<%= lead.email %>', '<%= lead.phone %>', '<%= lead.product_id %>')">
+                                            <i class="bi bi-pencil-square fs-5"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" style="text-decoration: none;" class="text-body ms-3" data-bs-toggle="tooltip" data-bs-original-title="Delete Lead" onclick="onDelete('<%= lead.id %>', '<%= index + 1 %>')">
+                                            <i class="bi bi-trash fs-5"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" style="text-decoration: none;" class="text-body ms-3" data-bs-toggle="tooltip" data-bs-original-title="Ajukan Lead" onclick="onAjukan('<%= lead.id %>')">
+                                            <i class="bi bi-send fs-5"></i>
+                                        </a>
+                                    <% end %>
+
+                                    <% if can?(:approve, Lead) && lead.status == 'waiting' %>  <!-- Kondisi ini menambahkan pengecekan status 'waiting' -->
+                                        <a href="javascript:void(0)" style="text-decoration: none;" class="text-body ms-3" data-bs-toggle="tooltip" data-bs-original-title="Approve Lead" onclick="onApprove('<%= lead.id %>', 'approved')">
+                                            <i class="bi bi-check-square fs-5"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" style="text-decoration: none;" class="text-body ms-3" data-bs-toggle="tooltip" data-bs-original-title="Reject Lead" onclick="onApprove('<%= lead.id %>', 'rejected')">
+                                            <i class="bi bi-x-square fs-5"></i>
+                                        </a>
+                                    <% end %>
+                                </td>
+                        </tr>
+                    <% end %>
+                <% end %>
+            </tbody>
+        </table>
+
+        <div class="pagination-container">
+            <%= paginate @leads, remote: false, links: true, next_label: "Next ›", previous_label: "‹ Prev", window: 10 %>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,7 @@
+<h1>Welcome to CRM Dashboard</h1>
+<ul>
+  <li><%= link_to 'Leads', leads_path %></li>
+  <li><%= link_to 'Customers', customers_path %></li>
+  <li><%= link_to 'Products', products_path %></li>
+  <%= link_to 'Logout', destroy_user_session_path, method: :delete, class: 'btn btn-danger' %>
+</ul>

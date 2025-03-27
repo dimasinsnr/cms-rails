@@ -1,0 +1,27 @@
+<h1>Daftar Customer</h1>
+
+<%= render 'customers/customer_table', customers: @customers %>
+
+<script>
+    $(document).on('click', '.pagination a', function(event) {
+        event.preventDefault();
+        
+        var url = $(this).attr('href');
+        
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            success: function(response) {
+                var newCustomerTable = $(response).find('#customerTableBody').html();
+                var newPagination = $(response).find('.pagination-container').html();
+
+                $('#customerTableBody').html(newCustomerTable);
+                $('.pagination-container').html(newPagination);
+            },
+            error: function() {
+                alert("An error occurred while loading the customers.");
+            }
+        });
+    });
+</script>

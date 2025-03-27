@@ -1,0 +1,43 @@
+<div class="modal fade bd-example-modal-lg" id="modalAddLead" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content" style="width: 800px;">
+            <form action="javascript:onSave()" method="post" id="formLead" name="formLead" autocomplete="off" enctype="multipart/form-data" data-tour-add="1-ini adalah form anda" data-tour-update="4-mulai edit data">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold" id="exampleModalLongTitle">Tambah Lead</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="$('#modalAddLead').modal('hide');"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="lead[id]" id="id">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="fv-row mb-2">
+                                <label for="" class="form-label mb-1" style="font-size: 15px">Nama <span class="text-danger">*</span></label>
+                                <input type="text" id="name" name="lead[name]" class="form-control form-control-solid" required placeholder="Silahkan isi Nama Lead" />
+                            </div>
+                            <div class="fv-row mb-2">
+                                <label for="" class="form-label mb-1" style="font-size: 15px">Email  <span class="text-danger">*</span></label>
+                                <input type="email" id="email" name="lead[email]" class="form-control form-control-solid" required placeholder="Silahkan isi Email" />
+                            </div>
+                            <div class="fv-row mb-2">
+                                <label for="" class="form-label mb-1" style="font-size: 15px">Phone  <span class="text-danger">*</span></label>
+                                <input type="number" id="phone" name="lead[phone]" class="form-control form-control-solid" required placeholder="Silahkan isi Phone" />
+                            </div>
+                            <div class="fv-row mb-2">
+                                <label for="product_id" class="form-label mb-1" style="font-size: 15px">Produk <span class="text-danger">*</span></label>
+                                <select id="product_id" name="lead[product_id]" class="form-control form-control-solid" required>
+                                    <option value="" disabled selected>Pilih Produk</option>
+                                    <% @products.each do |product| %>
+                                        <option value="<%= product.id %>"><%= product.name %></option>
+                                    <% end %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="footer_modal_lead">
+                    <button type="submit" class="btn" style="background-color: #19184d; color: white;">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

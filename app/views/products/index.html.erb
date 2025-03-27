@@ -1,0 +1,134 @@
+<h1>Daftar Produk</h1>
+
+  <div class="text-end mb-3">
+    <% if can?(:create, Product) %>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" onclick="openModal()">
+        <i class="bi bi-plus-circle"></i> Tambah Produk
+      </button>
+    <% end %>
+  </div>
+
+<%= render 'products/product_table', products: @products %>
+<%= render 'products/product_modal', products: @products %>
+
+<script>
+    $(document).on('click', '.pagination a', function(event) {
+        event.preventDefault();
+        
+        var url = $(this).attr('href');
+        
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            success: function(response) {
+                var newProductTable = $(response).find('#productTableBody').html();
+                var newPagination = $(response).find('.pagination-container').html();
+
+                $('#productTableBody').html(newProductTable);
+                $('.pagination-container').html(newPagination);
+            },
+            error: function() {
+                alert("An error occurred while loading the products.");
+            }
+        });
+    });
+
+    openModal = () => {
+        $('#id').val('');
+        $('#name').val('');
+        $('#price').val('');
+        $('#modalAddProduk').modal('show');
+    }
+
+    onSave = () => {
+        var formData = new FormData($('[name="formProduk"]')[0]);
+        HELPER.confirm({
+            message: 'Anda yakin ingin menyimpan data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '<%= home_products_create_path %>',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false, 
+                        headers: {
+                          'X-CSRF-Token': csrfToken
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('products')
+                                $('#modalAddProduk').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddProduk').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        complete: (response) => {
+                            HELPER.unblock();
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onDelete = (id, index) => {
+        HELPER.confirm({
+            message: 'Anda yakin ingin menghapus data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '/home/products/' + id,
+                        type: 'DELETE',
+                        headers: {
+                          'X-CSRF-Token': csrfToken
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('products')
+                                $('#modalAddProduk').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddProduk').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        complete: (response) => {
+                            HELPER.unblock();
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onEdit = (id, name, price) => {
+        $('#id').val(id);
+        $('#name').val(name);
+        $('#price').val(parseInt(price).toString());
+        $('#modalAddProduk').modal('show');
+    }
+</script>

@@ -1,0 +1,87 @@
+<% if user_signed_in? %>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color:rgb(153, 152, 152);">
+    <div class="container">
+      <a class="navbar-brand text-white" href="#">Smart CRM</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link text-white" href="javascript:void(0)" id="products" onclick="getPage(this.id)">Products</a>
+          <a class="nav-link text-white" href="javascript:void(0)" id="leads" onclick="getPage(this.id)">Leads</a>
+          <a class="nav-link text-white" href="javascript:void(0)" id="customers" onclick="getPage(this.id)">Customers</a>
+          <% if can?(:read, User) %>
+            <a class="nav-link text-white" href="javascript:void(0)" id="users" onclick="getPage(this.id)">User</a>
+          <% end %>
+        </div>
+        <span class="badge bg-secondary me-2 ms-auto"><%= current_user.role.titleize %></span>
+        <%= button_to destroy_user_session_path, method: :delete, class: "btn btn-outline-light ms-3", id: "logoutBtn", onclick: "confirmLogout(event)" do %>
+          <i class="bi bi-box-arrow-right"></i> Logout
+        <% end %>
+      </div>
+    </div>
+  </nav>
+<% else %>
+  <%= link_to "Login", new_user_session_path %>
+<% end %>
+
+<div class="container">
+  <div class="mt-5" id="content-section">
+  </div>
+</div>
+
+<script>
+	$(() => {
+    init();
+  });
+
+  init = async () => {
+		await getPage('products');
+	}
+
+  getPage = (id) => {
+    var url;
+  
+    if (id === "products") {
+      url = "<%= home_products_path %>";
+    } else if (id === "leads") {
+      url = "<%= home_leads_path %>";
+    } else if (id === "customers") {
+      url = "<%= home_customers_path %>";
+    } else if (id === "users") {
+      url = "<%= home_users_path %>";
+    } else {
+      console.error("Invalid type provided");
+      return;
+    }
+    HELPER.block()
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(data) {
+        // var decodedHtml = atob(data.content_base64);
+        $('#content-section').html(data);
+
+        HELPER.unblock();
+      },
+      error: function(xhr, status, error) {
+        console.error('Terjadi kesalahan:', error);
+      }
+    });
+  }
+
+  confirmLogout = (e) => {
+      e.preventDefault();
+      HELPER.confirm({
+          title: 'Information?',
+          message: 'Apakah anda yakin ingin keluar?',
+          type: 'warning',
+          callback: function(result) {
+              if (result) {
+                  $(e.target).closest('form').submit();
+              }
+          }
+      });
+  }
+  
+</script>

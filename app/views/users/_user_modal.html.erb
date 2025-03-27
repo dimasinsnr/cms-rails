@@ -1,0 +1,39 @@
+<div class="modal fade bd-example-modal-lg" id="modalAddUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content" style="width: 800px;">
+            <form action="javascript:onSave()" method="post" id="formUser" name="formUser" autocomplete="off" enctype="multipart/form-data" data-tour-add="1-ini adalah form anda" data-tour-update="4-mulai edit data">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold" id="exampleModalLongTitle">Tambah User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="$('#modalAddUser').modal('hide');"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="user[id]" id="id">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="fv-row mb-2">
+                                <label for="" class="form-label mb-1" style="font-size: 15px">Email <span class="text-danger">*</span></label>
+                                <input type="email" id="email" name="user[email]" class="form-control form-control-solid" required placeholder="Silahkan isi email User" />
+                            </div>
+                            <div class="fv-row mb-2" id="password-field">
+                                <label for="" class="form-label mb-1" style="font-size: 15px">Password <span class="text-danger">*</span></label>
+                                <input type="password" id="password" name="user[password]" class="form-control form-control-solid" required placeholder="Silahkan isi Password" />
+                            </div>
+                            <div class="fv-row mb-2">
+                                <label for="role" class="form-label mb-1" style="font-size: 15px">Role <span class="text-danger">*</span></label>
+                                <select id="role" name="user[role]" class="form-control form-control-solid" required>
+                                    <option value="" disabled selected>Pilih Role</option>
+                                    <option value="sales">Sales</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="superadmin">Super Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn" style="background-color: #19184d; color: white;">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

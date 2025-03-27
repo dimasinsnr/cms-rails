@@ -1,0 +1,146 @@
+<h1>Daftar User</h1>
+
+    <div class="text-end mb-3">
+        <% if can?(:create, User) %>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" onclick="openModal()">
+            <i class="bi bi-plus-circle"></i> Tambah User
+        </button>
+        <% end %>
+    </div>
+
+<%= render 'users/user_table', users: @users %>
+<%= render 'users/user_modal', users: @users %>
+
+<script>
+    $(document).on('click', '.pagination a', function(event) {
+        event.preventDefault();
+        
+        var url = $(this).attr('href');
+        
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            success: function(response) {
+                var newUserTable = $(response).find('#userTableBody').html();
+                var newPagination = $(response).find('.pagination-container').html();
+
+                $('#userTableBody').html(newUserTable);
+                $('.pagination-container').html(newPagination);
+            },
+            error: function() {
+                alert("An error occurred while loading the users.");
+            }
+        });
+    });
+
+    openModal = () => {
+        $('#id').val('');         
+        $('#email').val('');      
+        $('#password').val('');   
+        $('#role').val('');       
+
+        $('#password').attr('required', true);
+        $('#password-field').show();
+
+        $('#modalAddUser').modal('show');
+    }
+
+    onSave = () => {
+        var formData = new FormData($('[name="formUser"]')[0]);
+        if ($('#id').val()) {
+            formData.delete("user[password]");
+        }
+        HELPER.confirm({
+            message: 'Anda yakin ingin menyimpan data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '<%= home_users_create_path %>',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false, 
+                        headers: {
+                          'X-CSRF-Token': csrfToken
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('users')
+                                $('#modalAddUser').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddUser').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        complete: (response) => {
+                            HELPER.unblock();
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onDelete = (id, index) => {
+        HELPER.confirm({
+            message: 'Anda yakin ingin menghapus data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '/home/users/' + id,
+                        type: 'DELETE',
+                        headers: {
+                          'X-CSRF-Token': csrfToken
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('users')
+                                $('#modalAddUser').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddUser').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        complete: (response) => {
+                            HELPER.unblock();
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onEdit = (id, email, role) => {
+        $('#id').val(id);
+        $('#email').val(email); 
+        $('#role').val(role);
+
+        $('#password-field').hide();
+        $('#password').removeAttr('required');
+
+        $('#modalAddUser').modal('show');
+    }
+</script>

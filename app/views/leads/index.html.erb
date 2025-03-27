@@ -1,0 +1,274 @@
+<h1>Daftar Lead</h1>
+
+  <div class="text-end mb-3">
+    <% if can?(:create, Lead) %>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" onclick="openModal()">
+        <i class="bi bi-plus-circle"></i> Tambah Lead
+      </button>
+    <% end %>
+  </div>
+
+<%= render 'leads/lead_table', leads: @leads %>
+<%= render 'leads/lead_modal', leads: @leads %>
+
+<script>
+    $(document).on('click', '.pagination a', function(event) {
+        event.preventDefault();
+        
+        var url = $(this).attr('href');
+        
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            success: function(response) {
+                var newLeadTable = $(response).find('#leadTableBody').html();
+                var newPagination = $(response).find('.pagination-container').html();
+
+                $('#leadTableBody').html(newLeadTable);
+                $('.pagination-container').html(newPagination);
+            },
+            error: function() {
+                alert("An error occurred while loading the leads.");
+            }
+        });
+    });
+
+    openModal = () => {
+        $('#id').val('');
+        $('#name').val('');
+        $('#email').val('');
+        $('#phone').val('');
+        $('#product_id').val('');
+        $('#name').prop('disabled', false);
+        $('#email').prop('disabled', false);
+        $('#phone').prop('disabled', false);
+        $('#product_id').prop('disabled', false);
+        $('#exampleModalLongTitle').text('Tambah Lead');
+        $('#footer_modal_lead').show();
+        $('#modalAddLead').modal('show');
+    }
+
+    onSave = () => {
+        var formData = new FormData($('[name="formLead"]')[0]);
+        HELPER.confirm({
+            message: 'Anda yakin ingin menyimpan data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '<%= home_leads_create_path %>',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false, 
+                        headers: {
+                          'X-CSRF-Token': csrfToken
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('leads')
+                                $('#modalAddLead').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddLead').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        error: (jqXHR, textStatus, errorThrown) => {
+                            $('#modalAddLead').hide();
+                            HELPER.showMessage({
+                                success: false,
+                                message: 'Terjadi kesalahan. Silakan coba lagi.',
+                                title: 'Error'
+                            });
+                        },
+                        complete: (response) => {
+                            HELPER.unblock();
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onAjukan = (id) => {
+        HELPER.confirm({
+            message: 'Anda yakin ingin mengajukan data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '/home/leads/' + id,
+                        type: 'PATCH',
+                        headers: {
+                          'X-CSRF-Token': csrfToken
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('leads')
+                                $('#modalAddLead').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddLead').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        error: (jqXHR, textStatus, errorThrown) => {
+                            $('#modalAddLead').hide();
+                            HELPER.showMessage({
+                                success: false,
+                                message: 'Terjadi kesalahan. Silakan coba lagi.',
+                                title: 'Error'
+                            });
+                        },
+                        complete: (response) => {
+                            HELPER.unblock();
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onDelete = (id, index) => {
+        HELPER.confirm({
+            message: 'Anda yakin ingin menghapus data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '/home/leads/' + id,
+                        type: 'DELETE',
+                        headers: {
+                          'X-CSRF-Token': csrfToken
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('leads')
+                                $('#modalAddLead').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddLead').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        complete: (response) => {
+                            HELPER.unblock();
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onApprove = (id, action) => {
+        HELPER.confirm({
+            message: action == 'approved' ? 'Anda yakin ingin Menyetujui data ?' : 'Anda yakin ingin Reject data ?',
+            callback: (result) => {
+                if (result) {
+                    HELPER.block();
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: '<%= home_leads_approve_path %>',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-Token': csrfToken
+                        },
+                        data: { 
+                            approve: {
+                                id: id,
+                                action: action     
+                            }
+                        },
+                        success: (response) => {
+                            if (response.success == true) {
+                                getPage('leads')
+                                $('#modalAddLead').modal('hide');
+                                HELPER.showMessage({
+                                    success: true,
+                                    message: response.message,
+                                    title: 'Success'
+                                });
+                            } else {
+                                $('#modalAddLead').hide();
+                                HELPER.showMessage({
+                                    success: false,
+                                    message: response.message,
+                                    title: 'False'
+                                });
+                            }
+                        },
+                        error: (jqXHR, textStatus, errorThrown) => {
+                            $('#modalAddLead').hide();
+                            HELPER.showMessage({
+                                success: false,
+                                message: 'Terjadi kesalahan. Silakan coba lagi.',
+                                title: 'Error'
+                            });
+                        },
+                        complete: (response) => {
+                            HELPER.unblock(500);
+                        }
+                    });
+                }
+            }
+        })
+    }
+
+    onEdit = (id, name, email, phone, product_id) => {
+        $('#id').val(id);
+        $('#name').val(name);
+        $('#email').val(email);
+        $('#phone').val(phone);
+        $('#product_id').val(product_id).trigger('change');
+        $('#name').prop('disabled', false);
+        $('#email').prop('disabled', false);
+        $('#phone').prop('disabled', false);
+        $('#product_id').prop('disabled', false);
+        $('#exampleModalLongTitle').text('Edit Lead');
+        $('#footer_modal_lead').show();
+        $('#modalAddLead').modal('show');
+    }
+
+    onView = (name, email, phone, product_id) => {
+        $('#name').val(name);
+        $('#email').val(email);
+        $('#phone').val(phone);
+        $('#product_id').val(product_id);
+        $('#name').prop('disabled', true);
+        $('#email').prop('disabled', true);
+        $('#phone').prop('disabled', true);
+        $('#product_id').prop('disabled', true);
+        $('#exampleModalLongTitle').text('View Lead');
+        $('#footer_modal_lead').hide();
+        $('#modalAddLead').modal('show');
+    }
+</script>
